@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>강한길&정예지</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    <style>
+/* [1] 폰트 설정 (fonts 폴더에 다운받은 폰트를 넣어주세요) */
+        @font-face {
+            font-family: 'GowunBatang-Regular';
+            src: url('./fonts/GowunBatang-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        :root {
+            --bg-beige: #f5f2ee;
+            --card-white: #ffffff;
+            --text-main: #333333;
+            --accent-color: #b8926a;
+            --btn-brown: #c1a692;
+            --intro-bg: #1a1a1a;
+        }
+
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0;
+
+
+overflow-x: hidden; 
+    width: 100%;
+    /* 터치 시 화면이 좌우로 튕기는 현상 방지 */
+    overscroll-behavior-x: none;
+
+            font-family: 'GowunBatang-Regular', 'Nanum Myeongjo', serif;
+            background-color: var(--bg-beige);
+            color: var(--text-main);
+	    font-size : 14px;
+            line-height: 1.6;
+        }
+
+
+
+/* Test_HKK지도 버튼 레이아웃 */
+.map-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.map-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 10px 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.75rem; /* 전체 글씨 크기 줄임에 맞춰 작게 조절 */
+    font-weight: bold;
+}
+
+.map-btn:active {
+    background-color: #f9f9f9;
+}
+
+
+
+
+        /* [3] 인트로 카운트다운 */
+        #intro-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--intro-bg);
+            z-index: 3000; cursor: pointer;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 1s ease;
+        }
+        #countdown { font-size: 3.5rem; color: #fff; font-weight: bold; margin-bottom: 40px; }
+
+        /* [4] 메인 콘텐츠 구조 */
+        #main-content { display: none; opacity: 0; transition: opacity 1.5s ease; }
+        .page-wrapper {
+	    width: 100%;
+            max-width: 500px; margin: 0 auto;
+	    margin: 0 auto;
+	    overflow-x: hidden;
+            background-color: var(--card-white);
+            box-shadow: 0 0 30px rgba(0,0,0,0.05);
+            min-height: 100vh;
+        }
+
+        /*메인 상단 사진 */
+        .main-top-photo {
+            width: 100%;
+            height: 65vh;
+            background: url(main.jpg) no-repeat center center/cover;
+        }
+
+        /* [5] 각 섹션 스타일 */
+        section { padding: 100px 25px; text-align: center; }
+        .section-divider { width: 130px; height: 2px; background-color: #eee; margin: 0 auto; }
+        .title { color: var(--accent-color); font-weight: bold; margin-bottom: 35px; letter-spacing: 3px; }
+
+        .family-info { margin-top: 40px; font-size: 0.95rem; }
+        .family-line { margin-bottom: 8px; }
+        .family-line span { color: #888; font-size: 0.85rem; margin: 0 5px; }
+        
+        .btn-contact {
+            display: inline-flex; align-items: center; justify-content: center;
+            background-color: var(--btn-brown); color: white;
+            border: none; padding: 12px 35px; border-radius: 8px;
+            font-size: 0.95rem; cursor: pointer; margin-top: 30px;
+            font-family: inherit;
+        }
+
+	/*Test_HKK_갤러리 사진 사이즈 조절부*/
+        .swiper { width: 100%; height: 600px; border-radius: 1px; }
+        .swiper-slide img { width: 100%; height: 100%; object-fit: cover; }
+
+        .account-box { margin-bottom: 20px; font-size: 0.9rem; }
+  .btn-copy { 
+    background: var(--btn-brown); 
+    border: none; 
+    padding: 5px 10px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 0.8rem; 
+    margin-left: 10px;
+    color: white; /*글씨색*/
+}
+        /* [6] 연락처 팝업 (모달) 스타일 */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); z-index: 4000; justify-content: center; align-items: flex-end;
+            transition: all 0.3s ease;
+        }
+        .modal.open { display: flex; opacity: 1; }
+
+        .modal-content { 
+            background: #fafafa; padding: 40px 25px 30px; border-top-left-radius: 20px; border-top-right-radius: 20px;
+            width: 100%; max-width: 450px; position: relative; max-height: 90vh; overflow-y: auto;
+            transform: translateY(100%); transition: transform 0.3s ease;
+        }
+        .modal.open .modal-content { transform: translateY(0); }
+
+        .modal-close-btn { 
+            position: absolute; top: 55px; right: 20px; background: none; border: none; 
+            font-size: 1.6rem; color: #999; cursor: pointer; padding: 0;
+        }
+
+        .contact-header { text-align: center; margin-bottom: 30px; }
+        .contact-header span.contact-sub { font-family: serif; font-style: italic; color: #bcaaa4; font-size: 0.9rem; letter-spacing: 2px; }
+        .contact-header h2 { font-size: 1.5rem; color: #8d6e63; font-weight: normal; margin: 5px 0 0; }
+
+        .contact-section { margin-bottom: 25px; text-align: left; }
+        .contact-section-title { font-size: 0.9rem; color: #333; margin-bottom: 8px; font-weight: bold; border-bottom: 1px solid #e0dfdb; padding-bottom: 5px; }
+        .contact-section-title span { color: #aaa; font-size: 0.7rem; letter-spacing: 1px; margin-left: 5px; font-weight: normal; }
+
+        .contact-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: white; padding: 18px 15px; border-radius: 12px; margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .contact-item-info { flex-grow: 1; }
+        .contact-item-role { font-size: 0.75rem; color: #999; margin-bottom: 3px; }
+        .contact-item-name { font-size: 1rem; color: #333; font-weight: bold; }
+
+        .contact-item-btns { display: flex; gap: 8px; }
+        .contact-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 38px; height: 38px; background: #c1a692; border-radius: 50%; color: white;
+            text-decoration: none; font-size: 1rem; border: none; cursor: pointer;
+        }
+        .contact-btn:hover { background: #b08d7e; }
+    </style>
+</head>
+<body>
+
+
+
+
+
+    <div id="intro-screen" onclick="showMainContent()">
+        <p style="color:#fff; font-size: 1.0rem; letter-spacing: 12px; margin-bottom: 30px; opacity: 0.7;">COUNTDOWN</p>
+        <div id="countdown">00:00:00:00</div>
+        <p style="color:#fff; font-size: 0.95rem; letter-spacing: 8px; opacity: 0.5;">TAP TO OPEN</p>
+    </div>
+
+    <div id="main-content">
+        <div class="page-wrapper">
+            
+            <div class="main-top-photo"></div>
+
+            <header style="padding: 40px 25px 60px; text-align: center;">
+              <div class="title">WEDDING DAY</div>
+                <div style="font-size: 1.7rem; font-weight: bold;">강한길 & 정예지</div>
+                <div style="margin-top: 15px; font-size: 1.1rem; color: #666;">2026. 05. 31. SUN PM 01:40</div>
+            </header>
+
+            <div class="section-divider"></div>
+
+            <section>
+                <div class="title">INVITATION</div>
+                <p>저희 결혼합니다<br>서로를 가장 잘 이해하고 같이 있을 때 행복한</p>
+                <p>평생을 함께하고픈 소중한 반쪽을 만나<br>부부가 되기로 약속하였습니다.</p>
+                <p>저희의 새로운 시작을 알리는 기쁜 날에<br>소중한 시간 내어 함께 축하해주시면 감사하겠습니다.</p>
+
+                <div class="family-info">
+                    <div style="margin-bottom: 80px;"><span style="font-size: 1.5rem; color: var(--accent-color);">♡</span></div>
+                    <div class="family-line">강홍식 · 신동숙<span>의 아들</span> 강한길</div>
+                    <div class="family-line">정호영 · 이성숙<span>의 딸</span> 정예지</div>
+                </div>
+                <button class="btn-contact" onclick="openModal()">연락하기</button>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <section>
+                <div class="title">GALLERY</div>
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide"><img src="./images/gal_photo1.jpg" alt="gal_photo1"></div>
+                        <div class="swiper-slide"><img src="./images/gal_photo2.jpg" alt="gal_photo2"></div>
+                        <div class="swiper-slide"><img src="./images/gal_photo3.jpg" alt="gal_photo3"></div>
+                        <div class="swiper-slide"><img src="./images/gal_photo4.jpg" alt="gal_photo4"></div>
+                        <div class="swiper-slide"><img src="./images/gal_photo5.jpg" alt="gal_photo5"></div>
+                        <div class="swiper-slide"><img src="./images/gal_photo6.jpg" alt="gal_photo6"></div>
+                        <div class="swiper-slide"><img src="./images/invit_1.png" alt="invit_1"></div>
+                        <div class="swiper-slide"><img src="./images/invit_2.png" alt="invit_2"></div>
+                        <div class="swiper-slide"><img src="./images/invit_3.png" alt="invit_3"></div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <section>
+                <div class="title">LOCATION</div>
+                <strong style="font-size: 1.2rem;">KDW웨딩</strong><br>
+                <span style="font-size: 0.95rem; color: #666;">서울특별시 강동구 천호대로 1102</span>
+                </p>
+
+<div style="font: inherit; width: 100%; height: 392px; color: #333; position: relative;">
+    <div style="height: 360px;">
+		<a href="https://map.kakao.com/?urlX=529548.0000000003&amp;urlY=1120995.0000000035&amp;itemId=10124741&amp;q=KDW%EC%9B%A8%EB%94%A9&amp;srcid=10124741&amp;map_type=TYPE_MAP&amp;from=roughmap" target="_blank">
+			<img class="map" src="http://t1.daumcdn.net/roughmap/imgmap/86b6c0554acc2fda267c2d92bd977cbfcff64cb85af0b83378d73b6500b15e0e" 			</a>
+	</div>
+	<div style="overflow: hidden; padding: 0px 0px; border: 0px solid rgba(0, 0, 0, 0.1); border-radius: 0px 0px 2px 2px; background-color: rgb(249, 249, 249);">
+<a href="https://map.kakao.com" target="_blank" style="float: left;">
+</a>
+<div style="float: right; position: relative; top: 1px; font-size: 11px;">
+<a target="_blank" href="https://map.kakao.com/?from=roughmap&amp;srcid=10124741&amp;confirmid=10124741&amp;q=KDW%EC%9B%A8%EB%94%A9&amp;rv=on"
+</a>
+</div></div><div></div></div>
+
+<div class="map-buttons">
+        <a href="https://naver.me/FPn5kMTA" target="_blank" class="map-btn">
+            <style="height: 10px;"> 네이버 지도
+        </a>
+        <a href="https://kko.to/1ubpbyxg_F" target="_blank" class="map-btn">
+            <span style="color:#fee500; filter: drop-shadow(0 0 1px #000); font-size: 0.7rem;">●</span> 카카오맵
+        </a>
+        <a href="https://tmap.life/988c9bd9" target="_blank" class="map-btn">
+            <span style="color:#ff4500; font-weight: bold;">T</span> 티맵
+        </a>
+    </div>
+
+
+
+                <div style="text-align: left; font-size: 0.85rem; color: #555; margin-top: 30px;">
+                    <p><strong>🚇 지하철 이용 시</strong><br>5호선 강동역 3번 출구에서 도보 1분 (직진 170m)</p>
+                    <p><strong>🚌 버스 이용 시</strong><br>강동역(중) 정류장 하차</p>
+		    <p><strong>간선버스(파랑)</strong> : 130, 341, 342, 370
+		    <p><strong>지선버스(초록)</strong> : 3214, 3316
+		    <p><strong>직행버스(빨강)</strong> : 1113, 1113-1
+		    <p><strong>일반버스(초록)</strong> : 1-4, 30-3, 112-1, 112-5
+		    <p><strong>공항버스</strong> : 6200(길동사거리 하차)
+                    <p><strong>🅿️ 주차 안내</strong><br>건물 내 지하 주차장(지하 1~3층) 및 외부 옥외 주차장 또는 지하철 환승 주차장 이용</p>
+                    <p><strong> 네비게이션 안내</strong><br>"KDW웨딩" 또는 서울시 천호대로 1102</p>
+                </div>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <section>
+                <div class="title">GIFT</div>
+                <p style="font-size: 0.9rem; margin-bottom: 45px;">축복해주시는 소중한 마음,<br>잊지 않고 예쁘게 살겠습니다.</p>
+                <div class="account-box">
+                    <strong>신랑측 계좌</strong></p>
+                    국민은행 937702-00-170320 (강한길)</p>
+                    <button class="btn-copy" onclick="copyText('93770200170320')">복사</button>
+                    <strong> </strong></p>
+
+                </div>
+                <div class="account-box">
+                    <strong>신부측 계좌</strong></p>
+                    우리은행 1002-948-270971 (정예지)</p>
+                    <button class="btn-copy" onclick="copyText('1002948270971')">복사</button>
+                </div>
+            </section>
+
+            <footer style="padding: 30px 20px; font-size: 1.00rem; color: #b8926a; text-align: center; background-color: #f5f2ee;">
+                Copyright © 2026 강한길 & 정예지
+            </footer>
+        </div>
+    </div>
+
+    <div id="contactModal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+            
+            <div class="contact-header">
+                <span class="contact-sub">Contact</span>
+                <h2>연락하기</h2>
+            </div>
+
+            <div class="contact-section">
+                <div class="contact-section-title">신랑 측<span>GROOM</span></div>
+                <div class="contact-item">
+                    <div class="contact-item-info">
+                        <div class="contact-item-role">신랑</div>
+                        <div class="contact-item-name">강한길</div>
+                    </div>
+                    <div class="contact-item-btns">
+                        <a href="tel:01026432936" class="contact-btn">📞</a>
+                        <a href="sms:01026432936" class="contact-btn">💬</a>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-item-info">
+                        <div class="contact-item-role">신랑 아버님</div>
+                        <div class="contact-item-name">강홍식</div>
+                    </div>
+                    <div class="contact-item-btns">
+                        <a href="tel:01077106136" class="contact-btn">📞</a>
+                        <a href="sms:01077106136" class="contact-btn">💬</a>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-item-info">
+                        <div class="contact-item-role">신랑 어머님</div>
+                        <div class="contact-item-name">신동숙</div>
+                    </div>
+                    <div class="contact-item-btns">
+                        <a href="tel:01021250550" class="contact-btn">📞</a>
+                        <a href="sms:01021250550" class="contact-btn">💬</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-section">
+                <div class="contact-section-title">신부 측<span>BRIDE</span></div>
+                <div class="contact-item">
+                    <div class="contact-item-info">
+                        <div class="contact-item-role">신부</div>
+                        <div class="contact-item-name">정예지</div>
+                    </div>
+                    <div class="contact-item-btns">
+                        <a href="tel:01056059129" class="contact-btn">📞</a>
+                        <a href="sms:01056059129" class="contact-btn">💬</a>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-item-info">
+                        <div class="contact-item-role">신부 아버님</div>
+                        <div class="contact-item-name">정호영</div>
+                    </div>
+                    <div class="contact-item-btns">
+                        <a href="tel:01021639129" class="contact-btn">📞</a>
+                        <a href="sms:01021639129" class="contact-btn">💬</a>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-item-info">
+                        <div class="contact-item-role">신부 어머님</div>
+                        <div class="contact-item-name">이성숙</div>
+                    </div>
+                    <div class="contact-item-btns">
+                        <a href="tel:01072329119" class="contact-btn">📞</a>
+                        <a href="sms:01072329119" class="contact-btn">💬</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+
+
+
+        // [1] 카운트다운 로직
+        const targetDate = new Date('May 31, 2026 13:40:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+            const d = Math.floor(distance / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+            const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+            const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+            const s = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, '0');
+            document.getElementById('countdown').innerHTML = (distance < 0) ? "00:00:00:00" : `${d}:${h}:${m}:${s}`;
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+// [3] 화면 전환 및 음악 재생 시작
+        function showMainContent() {
+            const intro = document.getElementById('intro-screen');
+            const main = document.getElementById('main-content');
+
+
+            intro.style.opacity = '0';
+            setTimeout(() => {
+                intro.style.display = 'none';
+                main.style.display = 'block';
+                setTimeout(() => { 
+                    main.style.opacity = '1';
+                    new Swiper(".mySwiper", { 
+                        pagination: { el: ".swiper-pagination" }, 
+                        loop: true, 
+                        autoplay: { delay: 5000, disableOnInteraction: false },
+                        speed: 500
+                    });
+                }, 100);
+            }, 1000);
+        }
+
+
+
+        // [3] 연락처 모달 열기/닫기 (애니메이션 포함)
+        function openModal() {
+            const modal = document.getElementById('contactModal');
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.classList.add('open'); }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('contactModal');
+            modal.classList.remove('open');
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+        }
+
+        // [4] 복사 기능
+        function copyText(text) { 
+            navigator.clipboard.writeText(text).then(() => alert("계좌번호가 복사되었습니다.")); 
+        }
+    </script>
+</body>
+</html>
