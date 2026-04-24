@@ -453,9 +453,9 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // [2] 자동 전환 타이머 (30초) 및 중복 실행 방지 플래그
+        // [2] 자동 전환 타이머 (20초) 및 중복 실행 방지 플래그
         let isIntroHidden = false;
-        let autoTransitionTimer = setTimeout(showMainContent, 30000);
+        let autoTransitionTimer = setTimeout(showMainContent, 20000);
 
         // [3] 화면 전환 및 스와이퍼 시작
         function showMainContent() {
